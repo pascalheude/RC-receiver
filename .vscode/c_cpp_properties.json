@@ -1,0 +1,30 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "C:\\Users\\pasca\\arduino-1.8.12\\tools\\**",
+                "C:\\Users\\pasca\\arduino-1.8.12\\hardware\\tools\\**",
+                "C:\\Users\\pasca\\arduino-1.8.12\\hardware\\arduino\\avr\\**",
+                "C:\\Users\\pasca\\Documents\\Arduino\\libraries\\**",
+                "C:\\Users\\pasca\\arduino-1.8.12\\libraries\\**",
+                "C:\\Users\\pasca\\Documents\\Arduino\\hardware\\espressif\\esp32\\**",
+                "C:\\Users\\pasca\\arduino-1.8.13\\hardware\\arduino\\avr\\**",
+                "C:\\Users\\pasca\\arduino-1.8.13\\hardware\\tools\\**",
+                "C:\\Users\\pasca\\arduino-1.8.13\\libraries\\**",
+                "C:\\Users\\pasca\\arduino-1.8.13\\tools\\**"
+            ],
+            "forcedInclude": [
+                "C:\\Users\\pasca\\arduino-1.8.12\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h",
+                "C:\\Users\\pasca\\arduino-1.8.13\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
+            ],
+            "defines": [
+                "USBCON"
+            ],
+            "intelliSenseMode": "msvc-x64",
+            "cStandard": "c17",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
