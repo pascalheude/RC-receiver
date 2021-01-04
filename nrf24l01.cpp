@@ -5,7 +5,6 @@
 #include "RC-receiver.h"
 #include "mapping.h"
 
-
 #define RADIO_ID 0 // Reveiver radio ID. The transmitter will send to this ID
 
 T_radio_packet radio_data;
@@ -29,7 +28,7 @@ void initializeRadio(void)
 #ifdef SPY
         Serial.println("Cannot communicate with radio");
 #endif // SPY
-        while (1); // Wait here forever.
+        while(true); // Wait here forever.
     }
     else
     {

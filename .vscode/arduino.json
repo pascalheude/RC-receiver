@@ -3,5 +3,6 @@
     "sketch": "RC-receiver.ino",
     "configuration": "cpu=16MHzatmega328",
     "programmer": "AVRISP mkII",
-    "output": "./build"
+    "output": "./build",
+    "port": "COM4"
 }

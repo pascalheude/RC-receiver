@@ -75,7 +75,8 @@ void initializeMpu6050(void)
     measure[PITCH] = 0.0f;
     measure[YAW] = 0.0f;
     Wire.begin();
-    TWBR = 12; // Set the I2C clock speed to 400kHz
+    Wire.setClock(400000);
+    // TWBR = 12; // Set the I2C clock speed to 400kHz
     setMpu6050Register();
 }
 

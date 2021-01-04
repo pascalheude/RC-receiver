@@ -1,6 +1,6 @@
 typedef struct
 {
-    uint32_t tx_time;
+    UNS32 tx_time;
     UNS8 from_radio_id;
     UNS8 failed_tx_count;
     UNS8 l_joystick_button;
