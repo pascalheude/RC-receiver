@@ -22,7 +22,7 @@ void setup(void)
     Serial.begin(115200);
 #endif
     initializeData();
-    loop_timer = micros();
+    loop_timer = 0;
 }
 
 void loop(void)
