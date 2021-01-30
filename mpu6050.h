@@ -11,4 +11,6 @@
 extern REAL32 measure[];
 
 extern void initializeMpu6050(void);
+extern void readSensor(void);
 extern BOOLEAN calibrateMpu6050(void);
+extern void calculateAngle(void);

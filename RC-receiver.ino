@@ -8,14 +8,16 @@
 #include "RC-receiver.h"
 #include "data_ini.h"
 #include "drone.h"
+#include "led.h"
 
 UNS32 pit_number;
 
-UNS32 loop_timer;
+static UNS32 loop_timer;
 
 void setup(void)
 {
     pit_number = 1;
+    Serial.begin(115200);
 #ifdef SPY
     Serial.begin(115200);
 #endif
@@ -25,10 +27,18 @@ void setup(void)
 
 void loop(void)
 {
+    switchOnLed1();
+    loop_timer = micros() + 1000 * PIT_PERIOD;
     manageDrone();
-    while((micros() - loop_timer) < (PIT_PERIOD * 1000))
+    pit_number++;
+    if (F_no_reception == false)
+    {
+        switchOffLed1();
+    }
+    else
     {
     }
-    loop_timer = micros();
-    pit_number++;
+    while(micros() < loop_timer)
+    {
+    }
 }

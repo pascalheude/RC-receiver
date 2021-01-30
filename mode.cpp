@@ -3,6 +3,7 @@
 #include "mode.h"
 #include "drone.h"
 #include "esc.h"
+#include "led.h"
 #include "mpu6050.h"
 #include "RC-receiver.h"
 
@@ -46,6 +47,7 @@ void manageMode(void)
             break;
 #endif // SPY
         case STARTUP :
+            blinkLed2(500);
             if ((F_start_gyro_calibration_mem == true) && 
                 (F_start_gyro_calibration == false))
             {
@@ -53,6 +55,7 @@ void manageMode(void)
                 Serial.println("Mode : STARTUP -> CALIBRATION_GYRO");
 #endif // SPY
                 mode = CALIBRATION_GYRO;
+                switchOffLed2();
             }
             else
             {
@@ -60,12 +63,14 @@ void manageMode(void)
             }
             break;
         case CALIBRATION_GYRO :
+            blinkLed3(500);
             if (calibrateMpu6050())
             {
 #ifdef SPY
                 Serial.println("Mode : CALIBRATION_GYRO -> FLIGHT");
 #endif // SPY
                 mode = FLIGHT;
+                switchOffLed3();
             }
             else
             {
@@ -75,6 +80,7 @@ void manageMode(void)
             if (calibrateEsc(LF))
             {
                 mode = CALIBRATION_ESC_RF;
+                switchOnLed2();
             }
             else
             {
@@ -84,6 +90,8 @@ void manageMode(void)
             if (calibrateEsc(RF))
             {
                 mode = CALIBRATION_ESC_RR;
+                switchOffLed2();
+                switchOnLed3();
             }
             else
             {
@@ -93,6 +101,7 @@ void manageMode(void)
             if (calibrateEsc(RR))
             {
                 mode = CALIBRATION_ESC_LR;
+                switchOnLed2();
             }
             else
             {
@@ -109,17 +118,28 @@ void manageMode(void)
             }
             break;
         case FLIGHT :
-            if ((F_esc_calibration_done == false) &&
-                (F_start_esc_calibration_mem == true) &&
-                (F_start_esc_calibration == false))
+            blinkLed2(500);
+            blinkLed3(500);
+            if (F_esc_calibration_done == false)
             {
+                if ((F_start_esc_calibration_mem == true) &&
+                    (F_start_esc_calibration == false))
+                {
 #ifdef SPY
-                Serial.println("Mode : FLIGHT -> CALIBRATION_ESC_LF");
+                    Serial.println("Mode : FLIGHT -> CALIBRATION_ESC_LF");
 #endif // SPY
-                mode = CALIBRATION_ESC_LF;
+                    mode = CALIBRATION_ESC_LF;
+                    switchOffLed2();
+                    switchOffLed3();
+                }
+                else
+                {
+                }
             }
             else
             {
+                readSensor();
+                calculateAngle();
             }
             break;
     }

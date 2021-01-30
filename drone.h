@@ -1,3 +1,4 @@
+extern BOOLEAN F_no_reception;
 extern BOOLEAN F_start_gyro_calibration;
 extern BOOLEAN F_start_gyro_calibration_mem;
 extern BOOLEAN F_start_esc_calibration;

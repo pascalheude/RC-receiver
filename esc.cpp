@@ -13,23 +13,23 @@ UNS16 rr_esc_value;
 
 #define ESC_TMO 500
 
+static UNS8 esc_state;
+static UNS32 esc_time;
 static Servo lf_esc;
 static Servo rf_esc;
 static Servo lr_esc;
 static Servo rr_esc;
 static Servo *esc;
-static UNS8 esc_state;
-static UNS32 esc_time;
 
 void initializeEsc(void)
 {
+    esc_state = 0;
+    esc_time = 0;
     lf_esc.attach(CH1);
     rf_esc.attach(CH2);
     lr_esc.attach(CH3);
     rr_esc.attach(CH4);
     esc = 0;
-    esc_state = 0;
-    esc_time = 0;
 }
 
 BOOLEAN calibrateEsc(T_esc_position esc_position)

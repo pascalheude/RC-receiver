@@ -2,9 +2,10 @@
 #include <Wire.h>
 #include "standard.h"
 #include "mpu6050.h"
+#include "RC-receiver.h"
 
 #define MPU6050_ADDRESS 0x68 // I2C address of the MPU-6050
-#define SAMPLE_MAX 2048
+#define CALIBRATION_TMO 2048
 #define X 0
 #define Y 1
 #define Z 2
@@ -15,8 +16,8 @@
 REAL32 measure[3];
 
 static BOOLEAN F_initialized;
-static UNS16 calibration_loop;
 static UNS16 temperature;
+static UNS32 calibration_time;
 static REAL32 gyro_raw[3];
 static REAL32 acc_raw[3];
 static REAL32 gyro_offset[3];
@@ -54,7 +55,7 @@ void setMpu6050Register(void)
 void initializeMpu6050(void)
 {
     F_initialized = false;
-    calibration_loop = 0;
+    calibration_time = 0;
     temperature = 0;
     gyro_raw[X] = 0.0f;
     gyro_raw[Y] = 0.0f;
@@ -114,21 +115,29 @@ void readSensor(void)
 // During this step, the quadcopter needs to be static and on a horizontal surface
 BOOLEAN calibrateMpu6050(void)
 {
-    if (calibration_loop < SAMPLE_MAX)
+    if (calibration_time == 0)
+    {
+        calibration_time = pit_number;
+        readSensor();
+        gyro_offset[X] = gyro_raw[X];
+        gyro_offset[Y] = gyro_raw[Y];
+        gyro_offset[Z] = gyro_raw[Z];
+        return(false);
+    }
+    else if ((pit_number - calibration_time) < CALIBRATION_TMO)
     {
         readSensor();
         gyro_offset[X] += gyro_raw[X];
         gyro_offset[Y] += gyro_raw[Y];
         gyro_offset[Z] += gyro_raw[Z];
-        calibration_loop++;
         return(false);
     }
     else
     {
         // Calculate average offsets
-        gyro_offset[X] /= SAMPLE_MAX;
-        gyro_offset[Y] /= SAMPLE_MAX;
-        gyro_offset[Z] /= SAMPLE_MAX;
+        gyro_offset[X] /= CALIBRATION_TMO;
+        gyro_offset[Y] /= CALIBRATION_TMO;
+        gyro_offset[Z] /= CALIBRATION_TMO;
         return(true);
     }   
 }
