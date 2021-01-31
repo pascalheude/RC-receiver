@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include "standard.h"
+#include "data_ini.h"
+#include "battery.h"
 #include "drone.h"
 #include "gps.h"
 #include "led.h"
@@ -9,6 +11,7 @@
 
 void initializeData(void)
 {
+    initializeBattery();
     initializeDrone();
     initializeGps();
     initializeLed();
