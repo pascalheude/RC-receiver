@@ -9,9 +9,9 @@
 #define X 0
 #define Y 1
 #define Z 2
-#define RAD_TO_DEG 57.29577951308f
+#define RAD_TO_DEG (REAL32)57.29577951308f
 #define FREQ 250 // Sampling frequency
-#define SSF_GYRO 65.5f // Sensitivity Scale Factor of the gyro from datasheet
+#define SSF_GYRO (REAL32)65.5f // Sensitivity Scale Factor of the gyro from datasheet
 
 REAL32 measure[3];
 
@@ -57,24 +57,24 @@ void initializeMpu6050(void)
     F_initialized = false;
     calibration_time = 0;
     temperature = 0;
-    gyro_raw[X] = 0.0f;
-    gyro_raw[Y] = 0.0f;
-    gyro_raw[Z] = 0.0f;
-    acc_raw[X] = 0.0f;
-    acc_raw[Y] = 0.0f;
-    acc_raw[Z] = 0.0f;
-    gyro_offset[X] = 0.0f;
-    gyro_offset[Y] = 0.0f;
-    gyro_offset[Z] = 0.0f;
-    acc_angle[X] = 0.0f;
-    acc_angle[Y] = 0.0f;
-    acc_angle[Z] = 0.0f;
-    gyro_angle[X] = 0.0f;
-    gyro_angle[Y] = 0.0f;
-    gyro_angle[Z] = 0.0f;
-    measure[ROLL] = 0.0f;
-    measure[PITCH] = 0.0f;
-    measure[YAW] = 0.0f;
+    gyro_raw[X] = (REAL32)0.0f;
+    gyro_raw[Y] = (REAL32)0.0f;
+    gyro_raw[Z] = (REAL32)0.0f;
+    acc_raw[X] = (REAL32)0.0f;
+    acc_raw[Y] = (REAL32)0.0f;
+    acc_raw[Z] = (REAL32)0.0f;
+    gyro_offset[X] = (REAL32)0.0f;
+    gyro_offset[Y] = (REAL32)0.0f;
+    gyro_offset[Z] = (REAL32)0.0f;
+    acc_angle[X] = (REAL32)0.0f;
+    acc_angle[Y] = (REAL32)0.0f;
+    acc_angle[Z] = (REAL32)0.0f;
+    gyro_angle[X] = (REAL32)0.0f;
+    gyro_angle[Y] = (REAL32)0.0f;
+    gyro_angle[Z] = (REAL32)0.0f;
+    measure[ROLL] = (REAL32)0.0f;
+    measure[PITCH] = (REAL32)0.0f;
+    measure[YAW] = (REAL32)0.0f;
     Wire.begin();
     Wire.setClock(400000);
     // TWBR = 12; // Set the I2C clock speed to 400kHz
@@ -172,26 +172,26 @@ void calculateAccelerometerAngle(void)
     {
         acc_angle[X] = RAD_TO_DEG * asin(acc_raw[X] / acc_total_vector); // asin gives angle in radian. Convert to degree multiplying by 180/pi
     }
-    else if (acc_raw[X] > 0.0f)
+    else if (acc_raw[X] > (REAL32)0.0f)
     {
-        acc_angle[X] = 90.0f;
+        acc_angle[X] = (REAL32)90.0f;
     }
     else
     {
-        acc_angle[X] = -90.0f;
+        acc_angle[X] = (REAL32)-90.0f;
     }
 
     if (abs(acc_raw[Y]) < acc_total_vector)
     {
         acc_angle[Y] = RAD_TO_DEG * asin(acc_raw[Y] / acc_total_vector);
     }
-    else if (acc_raw[Y] > 0.0f)
+    else if (acc_raw[Y] > (REAL32)0.0f)
     {
-        acc_angle[Y] = 90.0f;
+        acc_angle[Y] = (REAL32)90.0f;
     }
     else
     {
-        acc_angle[Y] = -90.0f;
+        acc_angle[Y] = (REAL32)-90.0f;
     }
 }
 
@@ -204,8 +204,8 @@ void calculateAngle(void)
     if (F_initialized)
     {
         // Correct the drift of the gyro with the accelerometer
-        gyro_angle[X] = (gyro_angle[X] * 0.9996f) + (acc_angle[X] * 0.0004f);
-        gyro_angle[Y] = (gyro_angle[Y] * 0.9996f) + (acc_angle[Y] * 0.0004f);
+        gyro_angle[X] = ((REAL32)0.9996f * gyro_angle[X]) + ((REAL32)0.0004f * acc_angle[X]);
+        gyro_angle[Y] = ((REAL32)0.9996f * gyro_angle[Y]) + ((REAL32)0.0004f * acc_angle[Y]);
     }
     else
     {
@@ -215,7 +215,7 @@ void calculateAngle(void)
         gyro_angle[Y] = acc_angle[Y];
     }
     // To dampen the pitch and roll angles a complementary filter is used
-    measure[ROLL]  = (measure[ROLL]  * 0.9f) + (gyro_angle[X] * 0.1f);
-    measure[PITCH] = (measure[PITCH] * 0.9f) + (gyro_angle[Y] * 0.1f);
+    measure[ROLL]  = ((REAL32)0.9f * measure[ROLL]) + ((REAL32)0.1f * gyro_angle[X]);
+    measure[PITCH] = ((REAL32)0.9f * measure[PITCH]) + ((REAL32)0.1f * gyro_angle[Y]);
     measure[YAW]   = -gyro_raw[Z] / SSF_GYRO; // Store the angular motion for this axis
 }
