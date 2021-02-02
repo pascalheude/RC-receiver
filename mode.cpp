@@ -5,6 +5,7 @@
 #include "esc.h"
 #include "led.h"
 #include "mpu6050.h"
+#include "nrf24l01.h"
 #include "RC-receiver.h"
 
 typedef enum {
@@ -15,6 +16,7 @@ typedef enum {
     STARTUP = 0,
 #endif // SPY
     CALIBRATION_GYRO,
+    START_ESC_CALIBRATION,
     CALIBRATION_ESC_LF,
     CALIBRATION_ESC_RF,
     CALIBRATION_ESC_LR,
@@ -47,7 +49,6 @@ void manageMode(void)
             break;
 #endif // SPY
         case STARTUP :
-            blinkLed2(500);
             if ((F_start_gyro_calibration_mem == true) && 
                 (F_start_gyro_calibration == false))
             {
@@ -59,11 +60,10 @@ void manageMode(void)
             }
             else
             {
-                
+                blinkLed2(500);
             }
             break;
         case CALIBRATION_GYRO :
-            blinkLed3(500);
             if (calibrateMpu6050())
             {
 #ifdef SPY
@@ -71,6 +71,17 @@ void manageMode(void)
 #endif // SPY
                 mode = FLIGHT;
                 switchOffLed3();
+            }
+            else
+            {
+                blinkLed3(500);
+            }
+            break;
+        case START_ESC_CALIBRATION :
+            startEscCalibration();
+            if (radio_data.li_push_button == true)
+            {
+                mode = CALIBRATION_ESC_LF;
             }
             else
             {
@@ -118,26 +129,21 @@ void manageMode(void)
             }
             break;
         case FLIGHT :
-            blinkLed2(500);
-            blinkLed3(500);
-            if (F_esc_calibration_done == false)
+            if ((F_esc_calibration_done == false) &&
+                (F_start_esc_calibration_mem == true) &&
+                (F_start_esc_calibration == false))
             {
-                if ((F_start_esc_calibration_mem == true) &&
-                    (F_start_esc_calibration == false))
-                {
 #ifdef SPY
-                    Serial.println("Mode : FLIGHT -> CALIBRATION_ESC_LF");
+                Serial.println("Mode : FLIGHT -> CALIBRATION_ESC_LF");
 #endif // SPY
-                    mode = CALIBRATION_ESC_LF;
-                    switchOffLed2();
-                    switchOffLed3();
-                }
-                else
-                {
-                }
+                mode = START_ESC_CALIBRATION;
+                switchOffLed2();
+                switchOffLed3();
             }
             else
             {
+                blinkLed2(500);
+                blinkLed3(500);
                 readSensor();
                 calculateAngle();
             }

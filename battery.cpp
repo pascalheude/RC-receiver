@@ -22,7 +22,7 @@ void monitorBatteryVoltage(void)
 {
     // Filter to reduce noise : 0.0088106 = 0.08 / 9.08
     battery_voltage = ((REAL32)0.92f * battery_voltage) + ((REAL32)0.0088106f * (REAL32)analogRead(BATTERY));
-    if (battery_voltage < )
+    if (battery_voltage < (REAL32)50.0f)
     {
         if (low_battery_time == 0)
         {

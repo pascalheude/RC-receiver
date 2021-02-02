@@ -11,5 +11,6 @@ extern UNS16 lr_esc_value;
 extern UNS16 rr_esc_value;
 
 extern void initializeEsc(void);
+extern void startEscCalibration(void);
 extern BOOLEAN calibrateEsc(T_esc_position esc_position);
 extern void driveEsc(T_esc_position esc_position, UNS16 value);

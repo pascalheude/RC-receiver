@@ -3,7 +3,6 @@
 #include "standard.h"
 #include "esc.h"
 #include "mapping.h"
-#include "nrf24l01.h"
 #include "RC-receiver.h"
 
 UNS16 lf_esc_value;
@@ -11,7 +10,7 @@ UNS16 rf_esc_value;
 UNS16 lr_esc_value;
 UNS16 rr_esc_value;
 
-#define ESC_TMO 500
+#define ESC_TMO 1000
 
 static UNS8 esc_state;
 static UNS32 esc_time;
@@ -26,10 +25,22 @@ void initializeEsc(void)
     esc_state = 0;
     esc_time = 0;
     lf_esc.attach(CH1);
+    lf_esc.write(0);
     rf_esc.attach(CH2);
+    rf_esc.write(0);
     lr_esc.attach(CH3);
+    lr_esc.write(0);
     rr_esc.attach(CH4);
+    rr_esc.write(0);
     esc = 0;
+}
+
+void startEscCalibration(void)
+{
+    lf_esc.write(90);
+    rf_esc.write(90);
+    lr_esc.write(90);
+    rr_esc.write(90);
 }
 
 BOOLEAN calibrateEsc(T_esc_position esc_position)
@@ -52,15 +63,13 @@ BOOLEAN calibrateEsc(T_esc_position esc_position)
                     esc = &rr_esc;
                     break;
             }
-            esc->write(90);
-            esc_time = 0;
+            esc->write(180);
+            esc_time = pit_number;
             esc_state = 1;
             break;
         case 1 :
-            if (radio_data.ro_push_button == true)
+            if ((pit_number - esc_time) >= (ESC_TMO/PIT_PERIOD)) 
             {
-                esc->write(180);
-                esc_time = pit_number;
                 esc_state = 2;
             }
             else
@@ -68,39 +77,20 @@ BOOLEAN calibrateEsc(T_esc_position esc_position)
             }
             break;
         case 2 :
-            if ((pit_number - esc_time) >= (ESC_TMO/PIT_PERIOD)) 
-            {
-                esc_state = 3;
-            }
-            else
-            {
-            }
+            esc->write(0);
+            esc_time = pit_number;
+            esc_state = 3;
             break;
         case 3 :
-            if (radio_data.ro_push_button == true)
-            {
-                esc->write(0);
-                esc_time = pit_number;
-                esc_state = 4;
-            }
-            else
-            {
-            }
-            break;
-        case 4 :
             if ((pit_number - esc_time) >= (ESC_TMO/PIT_PERIOD)) 
             {
-                esc_state = 5;
+                esc_time = 0;
+                esc_state = 0;
+                return(true);
             }
             else
             {
             }
-            break;
-        case 5 :
-            esc->write(0);
-            esc_time = 0;
-            esc_state = 0;
-            return(true);
             break;
         default :
             esc_state = 0;
