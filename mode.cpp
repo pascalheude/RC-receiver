@@ -21,6 +21,8 @@ typedef enum {
     CALIBRATION_ESC_RF,
     CALIBRATION_ESC_LR,
     CALIBRATION_ESC_RR,
+    STOP,
+    STARTING,
     FLIGHT
 } T_mode;
 
@@ -69,7 +71,7 @@ void manageMode(void)
 #ifdef SPY
                 Serial.println("Mode : CALIBRATION_GYRO -> FLIGHT");
 #endif // SPY
-                mode = FLIGHT;
+                mode = STOP;
                 switchOffLed3();
             }
             else
@@ -122,13 +124,13 @@ void manageMode(void)
             if (calibrateEsc(LR))
             {
                 F_esc_calibration_done = true;
-                mode = FLIGHT;
+                mode = STOP;
             }
             else
             {
             }
             break;
-        case FLIGHT :
+        case STOP :
             if ((F_esc_calibration_done == false) &&
                 (F_start_esc_calibration_mem == true) &&
                 (F_start_esc_calibration == false))
@@ -142,8 +144,38 @@ void manageMode(void)
             }
             else
             {
+                blinkLed2(1000);
+                blinkLed3(1000);
+                if ((yaw <= (REAL32)1012.0f) && (throttle >= (REAL32)1012.0f))
+                {
+                    mode = STARTING;
+                }
+                else
+                {
+                }
+            }
+            break;
+        case STARTING :
+            if ((yaw >= (REAL32)1488.0f) && (yaw <= (REAL32)1512.0f) &&
+                (throttle >= (REAL32)1012.0f))
+            {
+                mode = FLIGHT;
+            }
+            else
+            {
                 blinkLed2(500);
                 blinkLed3(500);
+            }
+            break;
+        case FLIGHT :
+            if ((yaw >= (REAL32)1988.0f) && (throttle >= (REAL32)1012.0f))
+            {
+                mode = STOP;
+            }
+            else
+            {
+                blinkLed2(250);
+                blinkLed3(250);
                 readSensor();
                 calculateAngle();
             }
