@@ -26,8 +26,6 @@ static Servo ch5_servo; // TBR
 
 #define MIN_COMMAND (REAL32)0.0f
 #define MAX_COMMAND (REAL32)255.0f
-#define MIN_ESC_COMMAND (REAL32)1000.0f
-#define MAX_ESC_COMMAND (REAL32)2000.0f
 
 void initializeDrone(void)
 {

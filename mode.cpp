@@ -42,7 +42,6 @@ void initializeMode(void)
 
 void manageMode(void)
 {
-    //driveEsc(LF, lf_esc_value); // TBR
     switch(mode)
     {
 #ifdef SPY
