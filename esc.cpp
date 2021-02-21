@@ -118,11 +118,11 @@ void driveEsc(void)
 void stopEsc(void)
 {
     lf_esc_value = STOP_ESC;
-    lf_esc.readMicroseconds(STOP_ESC);
+    lf_esc.writeMicroseconds(STOP_ESC);
     rf_esc_value = STOP_ESC;
-    rf_esc.readMicroseconds(STOP_ESC);
+    rf_esc.writeMicroseconds(STOP_ESC);
     lr_esc_value = STOP_ESC;
-    lr_esc.readMicroseconds(STOP_ESC);
+    lr_esc.writeMicroseconds(STOP_ESC);
     rr_esc_value = STOP_ESC;
-    rr_esc.readMicroseconds(STOP_ESC);
+    rr_esc.writeMicroseconds(STOP_ESC);
 }
