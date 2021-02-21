@@ -14,6 +14,7 @@
 #define SSF_GYRO (REAL32)65.5f // Sensitivity Scale Factor of the gyro from datasheet
 
 REAL32 measure[3];
+REAL32 angular_motion[3];
 
 static BOOLEAN F_initialized;
 static UNS16 temperature;
@@ -75,6 +76,9 @@ void initializeMpu6050(void)
     measure[ROLL] = (REAL32)0.0f;
     measure[PITCH] = (REAL32)0.0f;
     measure[YAW] = (REAL32)0.0f;
+    angular_motion[ROLL] = (REAL32)0.0f;
+    angular_motion[PITCH] = (REAL32)0.0f;
+    angular_motion[YAW] = (REAL32)0.0f;
     Wire.begin();
     Wire.setClock(400000);
     // TWBR = 12; // Set the I2C clock speed to 400kHz
@@ -195,6 +199,13 @@ void calculateAccelerometerAngle(void)
     }
 }
 
+// Initialize gyro angles with accelerometer angles
+void resetGyroAngle(void)
+{
+    gyro_angle[X] = acc_angle[X];
+    gyro_angle[Y] = acc_angle[Y];
+}
+
 // Calculate real angles from gyro and accelerometer's values
 void calculateAngle(void)
 {
@@ -211,11 +222,14 @@ void calculateAngle(void)
     {
         F_initialized = true;
         // At very first start, init gyro angles with accelerometer angles
-        gyro_angle[X] = acc_angle[X];
-        gyro_angle[Y] = acc_angle[Y];
+        resetGyroAngle();
     }
     // To dampen the pitch and roll angles a complementary filter is used
     measure[ROLL]  = ((REAL32)0.9f * measure[ROLL]) + ((REAL32)0.1f * gyro_angle[X]);
     measure[PITCH] = ((REAL32)0.9f * measure[PITCH]) + ((REAL32)0.1f * gyro_angle[Y]);
     measure[YAW]   = -gyro_raw[Z] / SSF_GYRO; // Store the angular motion for this axis
+    // Apply low pass filter (10Hz cyt off frequency)
+    angular_motion[ROLL] = (REAL32)0.7f * angular_motion[ROLL] +  gyro_raw[X] * (REAL32)0.3f / SSF_GYRO;
+    angular_motion[PITCH] = (REAL32)0.7f * angular_motion[PITCH] +  gyro_raw[Y] * (REAL32)0.3f / SSF_GYRO;
+    angular_motion[YAW] = (REAL32)0.7f * angular_motion[YAW] +  gyro_raw[Z] * (REAL32)0.3f / SSF_GYRO;
 }

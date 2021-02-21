@@ -3,6 +3,7 @@
 #include "standard.h"
 #include "esc.h"
 #include "mapping.h"
+#include "mathf.h"
 #include "RC-receiver.h"
 
 UNS16 lf_esc_value;
@@ -11,6 +12,9 @@ UNS16 lr_esc_value;
 UNS16 rr_esc_value;
 
 #define ESC_TMO 1000
+#define STOP_ESC 1000
+#define MIN_ESC 1100
+#define MAX_ESC 2000
 
 static UNS8 esc_state;
 static UNS32 esc_time;
@@ -22,6 +26,10 @@ static Servo *esc;
 
 void initializeEsc(void)
 {
+    lf_esc_value = STOP_ESC;
+    rf_esc_value = STOP_ESC;
+    lr_esc_value = STOP_ESC;
+    rr_esc_value = STOP_ESC;
     esc_state = 0;
     esc_time = 0;
     lf_esc.attach(CH1);
@@ -99,21 +107,22 @@ BOOLEAN calibrateEsc(T_esc_position esc_position)
     return(false);
 }
 
-void driveEsc(T_esc_position esc_position, UNS16 value)
+void driveEsc(void)
 {
-    switch (esc_position)
-    {
-        case LF :
-            lf_esc.writeMicroseconds(value);
-            break;
-        case RF :
-            rf_esc.writeMicroseconds(value);
-            break;
-        case LR :
-            lr_esc.writeMicroseconds(value);
-            break;
-        case RR :
-            rr_esc.writeMicroseconds(value);
-            break;
-    }
+    lf_esc.writeMicroseconds(LIMIT(lf_esc_value, MIN_ESC, MAX_ESC));
+    rf_esc.writeMicroseconds(LIMIT(rf_esc_value, MIN_ESC, MAX_ESC));
+    lr_esc.writeMicroseconds(LIMIT(lr_esc_value, MIN_ESC, MAX_ESC));
+    rr_esc.writeMicroseconds(LIMIT(rr_esc_value, MIN_ESC, MAX_ESC));
+}
+
+void stopEsc(void)
+{
+    lf_esc_value = STOP_ESC;
+    lf_esc.readMicroseconds(STOP_ESC);
+    rf_esc_value = STOP_ESC;
+    rf_esc.readMicroseconds(STOP_ESC);
+    lr_esc_value = STOP_ESC;
+    lr_esc.readMicroseconds(STOP_ESC);
+    rr_esc_value = STOP_ESC;
+    rr_esc.readMicroseconds(STOP_ESC);
 }

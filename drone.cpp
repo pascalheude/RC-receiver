@@ -5,7 +5,7 @@
 #include "mapping.h"
 #include "esc.h"
 #include "led.h"
-#include "mapf.h"
+#include "mathf.h"
 #include "mode.h"
 #include "nrf24l01.h"
 #include "RC-receiver.h"
@@ -20,14 +20,14 @@ REAL32 roll;
 REAL32 pitch;
 REAL32 yaw;
 
-static UNS8 ch5_servo_value;
+static UNS8 ch5_servo_value; // TBR
 static UNS32 receive_time;
-static Servo ch5_servo;
+static Servo ch5_servo; // TBR
 
-#define MIN_COMMAND 0
-#define MAX_COMMAND 255
+#define MIN_COMMAND (REAL32)0.0f
+#define MAX_COMMAND (REAL32)255.0f
 #define MIN_ESC_COMMAND (REAL32)1000.0f
-#define MIN_ESC_COMMAND (REAL32)2000.0f
+#define MAX_ESC_COMMAND (REAL32)2000.0f
 
 void initializeDrone(void)
 {
@@ -41,7 +41,7 @@ void initializeDrone(void)
     pitch = MIN_ESC_COMMAND;
     yaw = MIN_ESC_COMMAND;
     receive_time = 0;
-    ch5_servo.attach(CH5);
+    ch5_servo.attach(CH5); // TBR
 }
 
 void manageDrone(void)
@@ -56,10 +56,10 @@ void manageDrone(void)
         F_start_gyro_calibration = radio_data.lo_push_button;
         F_start_esc_calibration_mem = F_start_esc_calibration;
         F_start_esc_calibration = radio_data.r_toggle_switch;
-        throttle = mapf((REAL32)radio_data.l_y_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MIN_ESC_COMMAND);
-        yaw = mapf((REAL32)radio_data.l_x_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MIN_ESC_COMMAND);
-        pitch = mapf((REAL32)radio_data.r_y_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MIN_ESC_COMMAND);
-        roll = mapf((REAL32)radio_data.r_x_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MIN_ESC_COMMAND);
+        throttle = mapf((REAL32)radio_data.l_y_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);
+        yaw = mapf((REAL32)radio_data.l_x_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);
+        pitch = mapf((REAL32)radio_data.r_y_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);
+        roll = mapf((REAL32)radio_data.r_x_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);
     }
     else
     {

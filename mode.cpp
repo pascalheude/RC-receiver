@@ -5,6 +5,7 @@
 #include "esc.h"
 #include "led.h"
 #include "mpu6050.h"
+#include "pid.h"
 #include "nrf24l01.h"
 #include "RC-receiver.h"
 
@@ -160,6 +161,8 @@ void manageMode(void)
                 (throttle >= (REAL32)1012.0f))
             {
                 mode = FLIGHT;
+                resetGyroAngle();
+                resetPid();
             }
             else
             {
@@ -171,6 +174,7 @@ void manageMode(void)
             if ((yaw >= (REAL32)1988.0f) && (throttle >= (REAL32)1012.0f))
             {
                 mode = STOP;
+                stopEsc();
             }
             else
             {
@@ -178,6 +182,8 @@ void manageMode(void)
                 blinkLed3(250);
                 readSensor();
                 calculateAngle();
+                performPid();
+                driveEsc();
             }
             break;
     }

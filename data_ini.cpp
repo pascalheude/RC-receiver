@@ -7,6 +7,7 @@
 #include "led.h"
 #include "mode.h"
 #include "mpu6050.h"
+#include "pid.h"
 #include "nrf24l01.h"
 
 void initializeData(void)
@@ -17,5 +18,6 @@ void initializeData(void)
     initializeLed();
     initializeMode();
     initializeMpu6050();
+    initializePid();
     initializeRadio();
 }
