@@ -146,7 +146,7 @@ void manageMode(void)
             {
                 blinkLed2(1000);
                 blinkLed3(1000);
-                if ((yaw <= (REAL32)1012.0f) && (throttle >= (REAL32)1012.0f))
+                if ((yaw <= (REAL32)1012.0f) && (throttle <= (REAL32)1012.0f))
                 {
                     mode = STARTING;
                 }
@@ -157,7 +157,7 @@ void manageMode(void)
             break;
         case STARTING :
             if ((yaw >= (REAL32)1488.0f) && (yaw <= (REAL32)1512.0f) &&
-                (throttle >= (REAL32)1012.0f))
+                (throttle <= (REAL32)1012.0f))
             {
                 mode = FLIGHT;
                 resetGyroAngle();
@@ -170,7 +170,7 @@ void manageMode(void)
             }
             break;
         case FLIGHT :
-            if ((yaw >= (REAL32)1988.0f) && (throttle >= (REAL32)1012.0f))
+            if ((yaw >= (REAL32)1988.0f) && (throttle <= (REAL32)1012.0f))
             {
                 mode = STOP;
                 stopEsc();
