@@ -55,9 +55,9 @@ void manageDrone(void)
         F_start_esc_calibration_mem = F_start_esc_calibration;
         F_start_esc_calibration = radio_data.r_toggle_switch;
         throttle = mapf((REAL32)radio_data.l_y_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);
-        yaw = mapf((REAL32)radio_data.l_x_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);
+        yaw = mapf((REAL32)radio_data.l_x_joystick, MAX_COMMAND, MIN_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);
         pitch = mapf((REAL32)radio_data.r_y_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);
-        roll = mapf((REAL32)radio_data.r_x_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);
+        roll = mapf((REAL32)radio_data.r_x_joystick, MAX_COMMAND, MIN_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);
     }
     else
     {
