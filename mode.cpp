@@ -8,7 +8,10 @@
 #include "pid.h"
 #include "nrf24l01.h"
 #include "RC-receiver.h"
-
+#ifdef LCD
+#include "rgb_lcd.h"
+#endif // LCD
+ 
 typedef enum {
 #ifdef SPY
     NONE = 0,
@@ -29,6 +32,9 @@ typedef enum {
 
 static BOOLEAN F_esc_calibration_done;
 static T_mode mode;
+#ifdef LCD
+static rgb_lcd lcd;
+#endif // LCD
 
 void initializeMode(void)
 {
@@ -38,6 +44,12 @@ void initializeMode(void)
 #else
     mode = STARTUP;
 #endif // SPY
+#ifdef LCD
+    lcd.begin(16, 2);
+    lcd.print("STARTUP");
+    lcd.setCursor(0, 1);
+    lcd.print("Push LO button");
+#endif // LCD
 }
 
 void manageMode(void)
@@ -57,6 +69,10 @@ void manageMode(void)
 #ifdef SPY
                 Serial.println("Mode : STARTUP -> CALIBRATION_GYRO");
 #endif // SPY
+#ifdef LCD
+                lcd.clear();
+                lcd.print("CALIBRATION GYRO");
+#endif // LCD
                 mode = CALIBRATION_GYRO;
                 switchOffLed2();
             }
@@ -69,8 +85,14 @@ void manageMode(void)
             if (calibrateMpu6050())
             {
 #ifdef SPY
-                Serial.println("Mode : CALIBRATION_GYRO -> FLIGHT");
+                Serial.println("Mode : CALIBRATION_GYRO -> STOP");
 #endif // SPY
+#ifdef LCD
+                lcd.clear();
+                lcd.print("STOP");
+                lcd.setCursor(0, 1);
+                lcd.print("R TGL->CALIBRATE");
+#endif // LCD
                 mode = STOP;
                 switchOffLed3();
             }
@@ -83,6 +105,12 @@ void manageMode(void)
             startEscCalibration();
             if (radio_data.li_push_button == true)
             {
+#ifdef LCD
+                lcd.clear();
+                lcd.print("CALIBRATION ESC");
+                lcd.setCursor(0, 1);
+                lcd.print("Left front");
+#endif // LCD
                 mode = CALIBRATION_ESC_LF;
             }
             else
@@ -92,6 +120,12 @@ void manageMode(void)
         case CALIBRATION_ESC_LF :
             if (calibrateEsc(LF))
             {
+#ifdef LCD
+                lcd.clear();
+                lcd.print("CALIBRATION ESC");
+                lcd.setCursor(0, 1);
+                lcd.print("Right front");
+#endif // LCD
                 mode = CALIBRATION_ESC_RF;
                 switchOnLed2();
             }
@@ -102,6 +136,12 @@ void manageMode(void)
         case CALIBRATION_ESC_RF :
             if (calibrateEsc(RF))
             {
+#ifdef LCD
+                lcd.clear();
+                lcd.print("CALIBRATION ESC");
+                lcd.setCursor(0, 1);
+                lcd.print("Right rear");
+#endif // LCD
                 mode = CALIBRATION_ESC_RR;
                 switchOffLed2();
                 switchOnLed3();
@@ -113,6 +153,12 @@ void manageMode(void)
         case CALIBRATION_ESC_RR :
             if (calibrateEsc(RR))
             {
+#ifdef LCD
+                lcd.clear();
+                lcd.print("CALIBRATION ESC");
+                lcd.setCursor(0, 1);
+                lcd.print("Left rear");
+#endif // LCD
                 mode = CALIBRATION_ESC_LR;
                 switchOnLed2();
             }
@@ -123,6 +169,10 @@ void manageMode(void)
         case CALIBRATION_ESC_LR :
             if (calibrateEsc(LR))
             {
+#ifdef LCD
+                lcd.clear();
+                lcd.print("STOP");
+#endif // LCD
                 F_esc_calibration_done = true;
                 mode = STOP;
             }
@@ -138,6 +188,12 @@ void manageMode(void)
 #ifdef SPY
                 Serial.println("Mode : FLIGHT -> CALIBRATION_ESC_LF");
 #endif // SPY
+#ifdef LCD
+                lcd.clear();
+                lcd.print("CALIBRATION ESC");
+                lcd.setCursor(0, 1);
+                lcd.print("Push LI button");
+#endif // LCD
                 mode = START_ESC_CALIBRATION;
                 switchOffLed2();
                 switchOffLed3();
@@ -148,6 +204,10 @@ void manageMode(void)
                 blinkLed3(1000);
                 if ((yaw <= (REAL32)1012.0f) && (throttle <= (REAL32)1012.0f))
                 {
+#ifdef LCD
+                    lcd.clear();
+                    lcd.print("STARTING");
+#endif // LCD
                     mode = STARTING;
                 }
                 else
@@ -159,6 +219,10 @@ void manageMode(void)
             if ((yaw >= (REAL32)1488.0f) && (yaw <= (REAL32)1512.0f) &&
                 (throttle <= (REAL32)1012.0f))
             {
+#ifdef LCD
+                lcd.clear();
+                lcd.print("FLIGHT");
+#endif // LCD
                 mode = FLIGHT;
                 resetGyroAngle();
                 resetPid();
@@ -172,6 +236,11 @@ void manageMode(void)
         case FLIGHT :
             if ((yaw >= (REAL32)1988.0f) && (throttle <= (REAL32)1012.0f))
             {
+#ifdef LCD
+                lcd.clear();
+                lcd.print("STOP");
+#endif // LCD
+                F_esc_calibration_done = true;
                 mode = STOP;
                 stopEsc();
             }
