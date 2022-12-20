@@ -7,9 +7,11 @@
 #include "led.h"
 #include "mathf.h"
 #include "mode.h"
+#include "not.h"
 #include "nrf24l01.h"
 #include "RC-receiver.h"
 
+BOOLEAN F_one_reception_ok;
 BOOLEAN F_no_reception;
 BOOLEAN F_start_gyro_calibration;
 BOOLEAN F_start_gyro_calibration_mem;
@@ -29,6 +31,7 @@ static Servo ch5_servo; // TBR
 
 void initializeDrone(void)
 {
+    F_one_reception_ok = false;
     F_no_reception = false;
     F_start_gyro_calibration = false;
     F_start_gyro_calibration_mem = false;
@@ -46,14 +49,13 @@ void manageDrone(void)
 {
     if (readRadio())
     {
+        F_one_reception_ok = true;
         F_no_reception = false;
         receive_time = pit_number;
         ch5_servo_value = map(radio_data.l_potentiometer, 0, 255, 0, 180);  // TBR
         ch5_servo.write(ch5_servo_value);                                   // TBR
         F_start_gyro_calibration_mem = F_start_gyro_calibration;
-        F_start_gyro_calibration = radio_data.lo_push_button;
-        F_start_esc_calibration_mem = F_start_esc_calibration;
-        F_start_esc_calibration = radio_data.r_toggle_switch;
+        F_start_gyro_calibration = NOT(radio_data.lo_push_button);
         throttle = mapf((REAL32)radio_data.l_y_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);
         yaw = mapf((REAL32)radio_data.l_x_joystick, MAX_COMMAND, MIN_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);
         pitch = mapf((REAL32)radio_data.r_y_joystick, MIN_COMMAND, MAX_COMMAND, MIN_ESC_COMMAND, MAX_ESC_COMMAND);

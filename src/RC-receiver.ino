@@ -9,6 +9,7 @@
 #include "data_ini.h"
 #include "drone.h"
 #include "led.h"
+#include "spy.h"
 
 UNS32 pit_number;
 

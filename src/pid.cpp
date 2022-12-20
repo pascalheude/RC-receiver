@@ -5,6 +5,7 @@
 #include "esc.h"
 #include "mathf.h"
 #include "mpu6050.h"
+#include "spy.h"
 
 REAL32 set_point[3];
 REAL32 error[3];
@@ -130,4 +131,18 @@ void performPid(void)
         lr_esc_value = (UNS16)(throttle);
         rr_esc_value = (UNS16)(throttle);
     }
+#ifdef SPY_PID
+    Serial.print("error[YAW]=");
+    Serial.print(error[YAW], 4);
+    Serial.print(",error[PITCH]=");
+    Serial.print(error[PITCH], 4);
+    Serial.print(",error[ROLL]=");
+    Serial.print(error[ROLL], 4);
+    Serial.print(",yaw_pid=");
+    Serial.print(yaw_pid, 4);
+    Serial.print(",pitch_pid=");
+    Serial.print(pitch_pid, 4);
+    Serial.print(",roll_pid=");
+    Serial.println(roll_pid, 4);
+#endif
 }

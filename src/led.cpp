@@ -7,18 +7,22 @@
 static UNS8 led1_state;
 static UNS8 led2_state;
 static UNS8 led3_state;
+static UNS8 led2_3_state;
 static UNS32 led1_time;
 static UNS32 led2_time;
 static UNS32 led3_time;
+static UNS32 led2_3_time;
 
 void initializeLed(void)
 {
     led1_state = LOW;
     led2_state = LOW;
     led3_state = LOW;
+    led2_3_state = LOW;
     led1_time = 0;
     led2_time = 0;
     led3_time = 0;
+    led2_3_time = 0;
     pinMode(LED1, OUTPUT);
     pinMode(LED2, OUTPUT);
     pinMode(LED3, OUTPUT);
@@ -81,6 +85,29 @@ void blinkLed3(UNS32 time_out)
             led3_state = LOW;
         }
         digitalWrite(LED3, led3_state);
+    }
+    else
+    {
+    }    
+}
+
+void blinkLed2And3(UNS32 time_out)
+{
+    if ((pit_number - led2_3_time) > (time_out/PIT_PERIOD))
+    {
+        led2_3_time = pit_number;
+        if (led2_3_state == LOW)
+        {
+            led2_3_state = HIGH;
+            digitalWrite(LED2, HIGH);
+            digitalWrite(LED3, LOW);
+        }
+        else
+        {
+            led2_3_state = LOW;
+            digitalWrite(LED2, LOW);
+            digitalWrite(LED3, HIGH);
+        }
     }
     else
     {
