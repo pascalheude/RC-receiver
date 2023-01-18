@@ -3,7 +3,6 @@
 #include "standard.h"
 #include "drone.h"
 #include "mapping.h"
-#include "esc.h"
 #include "led.h"
 #include "mathf.h"
 #include "mode.h"
@@ -28,6 +27,8 @@ static Servo ch5_servo; // TBR
 
 #define MIN_COMMAND (REAL32)0.0f
 #define MAX_COMMAND (REAL32)255.0f
+#define MIN_ESC_COMMAND (REAL32)1000.0f
+#define MAX_ESC_COMMAND (REAL32)2000.0f
 
 void initializeDrone(void)
 {
@@ -63,6 +64,7 @@ void manageDrone(void)
     }
     else
     {
+        F_one_reception_ok = false;
         if ((pit_number - receive_time) > (5000/PIT_PERIOD))
         {
             F_no_reception = true;

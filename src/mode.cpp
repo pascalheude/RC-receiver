@@ -2,21 +2,17 @@
 #include "standard.h"
 #include "mode.h"
 #include "drone.h"
-#include "esc.h"
 #include "led.h"
-#include "mpu6050.h"
-#include "pid.h"
 #include "nrf24l01.h"
 #include "RC-receiver.h"
 #ifdef LCD
 #include "rgb_lcd.h"
 #endif // LCD
+#include "sbus.h"
 #include "spy.h"
  
 typedef enum {
     NONE = 0,
-    STARTUP,
-    CALIBRATION_GYRO,
     STOP,
     STARTING,
     FLIGHT
@@ -26,16 +22,30 @@ static T_mode mode;
 #ifdef LCD
 static rgb_lcd lcd;
 #endif // LCD
+bfs::SbusTx sbus_tx(&Serial);
+bfs::SbusData sbus_data;
 
 void initializeMode(void)
 {
+    UNS8 i;
+
 #ifdef SPY
     Serial.println("Mode : NONE");
 #endif // SPY
     mode = NONE;
 #ifdef LCD
     lcd.begin(16, 2);
+    lcd.clear();
+    lcd.print("NONE");
 #endif // LCD
+    sbus_tx.Begin();
+    for(i=0;i < sbus_data.NUM_CH;i++) {
+        sbus_data.ch[i] = 0;
+    }
+    sbus_data.ch17 = false;
+    sbus_data.ch18 = false;
+    sbus_data.failsafe = false;
+    sbus_data.lost_frame = false;
 }
 
 void manageMode(void)
@@ -43,60 +53,32 @@ void manageMode(void)
     switch(mode)
     {
         case NONE :
+            blinkLed2(500);
+            blinkLed3(500);
             if (F_one_reception_ok)
             {
 #ifdef SPY
-                Serial.println("Mode : NONE -> STARTUP");
-#endif // SPY
-                lcd.print("STARTUP");
-                lcd.setCursor(0, 1);
-                lcd.print("LO->GYRO CALIB.");
-                mode = STARTUP;
-            }
-            else
-            {
-            }
-            break;
-        case STARTUP :
-            if ((F_start_gyro_calibration_mem == true) && 
-                (F_start_gyro_calibration == false))
-            {
-#ifdef SPY
-                Serial.println("Mode : STARTUP -> CALIBRATION_GYRO");
-#endif // SPY
-#ifdef LCD
-                lcd.clear();
-                lcd.print("CALIBRATION GYRO");
-#endif // LCD
-                mode = CALIBRATION_GYRO;
-                switchOnLed2();
-                switchOffLed3();
-            }
-            else
-            {
-                blinkLed2And3(500);
-            }
-            break;
-        case CALIBRATION_GYRO :
-            if (calibrateMpu6050())
-            {
-#ifdef SPY
-                Serial.println("Mode : CALIBRATION_GYRO -> STOP");
+                Serial.println("Mode : NONE -> STOP");
 #endif // SPY
 #ifdef LCD
                 lcd.clear();
                 lcd.print("STOP");
 #endif // LCD
+                sbus_data.ch[0] = 0;
+                sbus_data.ch[1] = 0;
+                sbus_data.ch[2] = 0;
+                sbus_data.ch[3] = 0;
+                sbus_tx.data(sbus_data);
                 mode = STOP;
-                switchOffLed2();
             }
             else
             {
             }
             break;
         case STOP :
-            blinkLed2(1000);
-            blinkLed3(1000);
+            switchOffLed2();
+            switchOnLed3();
+            sbus_tx.Write();
             if ((yaw <= (REAL32)1012.0f) && (throttle <= (REAL32)1012.0f))
             {
 #ifdef LCD
@@ -105,11 +87,30 @@ void manageMode(void)
 #endif // LCD
                 mode = STARTING;
             }
+            else if (F_no_reception)
+            {
+#ifdef SPY
+                Serial.println("Mode : STOP -> NONE");
+#endif // SPY
+#ifdef LCD
+                lcd.clear();
+                lcd.print("NONE");
+#endif // LCD
+                sbus_data.ch[0] = 0;
+                sbus_data.ch[1] = 0;
+                sbus_data.ch[2] = 0;
+                sbus_data.ch[3] = 0;
+                sbus_tx.data(sbus_data);
+                mode = NONE;
+            }
             else
             {
             }
             break;
         case STARTING :
+            switchOnLed2();
+            switchOffLed3();
+            sbus_tx.Write();
             if ((yaw >= (REAL32)1488.0f) && (yaw <= (REAL32)1512.0f) &&
                 (throttle <= (REAL32)1012.0f))
             {
@@ -118,33 +119,67 @@ void manageMode(void)
                 lcd.print("FLIGHT");
 #endif // LCD
                 mode = FLIGHT;
-                resetGyroAngle();
-                resetPid();
+            }
+            else if (F_no_reception)
+            {
+#ifdef SPY
+                Serial.println("Mode : STARTING -> NONE");
+#endif // SPY
+#ifdef LCD
+                lcd.clear();
+                lcd.print("NONE");
+#endif // LCD
+                sbus_data.ch[0] = 0;
+                sbus_data.ch[1] = 0;
+                sbus_data.ch[2] = 0;
+                sbus_data.ch[3] = 0;
+                sbus_tx.data(sbus_data);
+                mode = NONE;
             }
             else
             {
-                blinkLed2(500);
-                blinkLed3(500);
             }
             break;
         case FLIGHT :
+            switchOnLed2();
+            switchOnLed3();
             if ((yaw >= (REAL32)1988.0f) && (throttle <= (REAL32)1012.0f))
             {
 #ifdef LCD
                 lcd.clear();
                 lcd.print("STOP");
 #endif // LCD
+                sbus_data.ch[0] = 0;
+                sbus_data.ch[1] = 0;
+                sbus_data.ch[2] = 0;
+                sbus_data.ch[3] = 0;
+                sbus_tx.data(sbus_data);
                 mode = STOP;
-                stopEsc();
+            }
+            else if (F_no_reception)
+            {
+#ifdef SPY
+                Serial.println("Mode : FLIGHT -> NONE");
+#endif // SPY
+#ifdef LCD
+                lcd.clear();
+                lcd.print("NONE");
+#endif // LCD
+                sbus_data.ch[0] = 0;
+                sbus_data.ch[1] = 0;
+                sbus_data.ch[2] = 0;
+                sbus_data.ch[3] = 0;
+                sbus_tx.data(sbus_data);
+                mode = NONE;
             }
             else
             {
-                blinkLed2(250);
-                blinkLed3(250);
-                readSensor();
-                calculateAngle();
-                performPid();
-                driveEsc();
+                sbus_data.ch[0] = (INT16)roll;
+                sbus_data.ch[1] = (INT16)pitch;
+                sbus_data.ch[2] = (INT16)yaw;
+                sbus_data.ch[3] = (INT16)throttle;
+                sbus_tx.data(sbus_data);
+                sbus_tx.Write();
             }
             break;
     }

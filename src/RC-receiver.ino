@@ -18,7 +18,6 @@ static UNS32 loop_timer;
 void setup(void)
 {
     pit_number = 1;
-    Serial.begin(115200);
 #ifdef SPY
     Serial.begin(115200);
 #endif
