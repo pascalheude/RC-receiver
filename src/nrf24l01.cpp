@@ -4,6 +4,7 @@
 #include "nrf24l01.h"
 #include "RC-receiver.h"
 #include "mapping.h"
+#include "spy.h"
 
 #define RADIO_ID 0 // Reveiver radio ID. The transmitter will send to this ID
 
