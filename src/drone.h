@@ -1,7 +1,8 @@
 #define MIN_ESC_COMMAND 192
 
 extern BOOLEAN F_one_reception_ok;
-extern BOOLEAN F_no_reception;
+extern BOOLEAN F_failsafe;
+extern BOOLEAN F_frame_lost;
 extern BOOLEAN r_toggle_switch;
 extern BOOLEAN li_push_button;
 extern BOOLEAN lo_push_button;

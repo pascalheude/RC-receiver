@@ -67,7 +67,7 @@ void initializeMode(void)
     }
     sbus_data.ch17 = false;
     sbus_data.ch18 = false;
-    sbus_data.failsafe = true;
+    sbus_data.failsafe = false;
     sbus_data.lost_frame = false;
     sbus_tx.data(sbus_data);
 }
@@ -96,6 +96,8 @@ void manageMode(void)
             }
             sbus_data.ch[4] = l_potentiometer;
             sbus_data.ch[5] = r_potentiometer;
+            sbus_data.lost_frame = F_frame_lost;
+            sbus_data.failsafe = F_failsafe;
             sbus_tx.data(sbus_data);
             sbus_tx.Write();
             break;
@@ -111,7 +113,7 @@ void manageMode(void)
                 r_toggle_switch_time = 0;
                 mode = STARTING;
             }
-            else if (F_no_reception)
+            else if (F_failsafe)
             {
 #ifdef SPY
                 Serial.println("Mode : STOP -> NONE");
@@ -159,6 +161,8 @@ void manageMode(void)
             }
             sbus_data.ch[4] = l_potentiometer;
             sbus_data.ch[5] = r_potentiometer;
+            sbus_data.lost_frame = F_frame_lost;
+            sbus_data.failsafe = F_failsafe;
             sbus_tx.data(sbus_data);
             sbus_tx.Write();
             break;
@@ -174,7 +178,7 @@ void manageMode(void)
 #endif // LCD
                 mode = FLIGHT;
             }
-            else if (F_no_reception)
+            else if (F_failsafe)
             {
 #ifdef SPY
                 Serial.println("Mode : STARTING -> NONE");
@@ -194,6 +198,8 @@ void manageMode(void)
             }
             sbus_data.ch[4] = l_potentiometer;
             sbus_data.ch[5] = r_potentiometer;
+            sbus_data.lost_frame = F_frame_lost;
+            sbus_data.failsafe = F_failsafe;
             sbus_tx.data(sbus_data);
             sbus_tx.Write();
             break;
@@ -215,7 +221,7 @@ void manageMode(void)
                 sbus_data.ch[THROTTLE] = MIN_ESC_COMMAND;
                 mode = STOP;
             }
-            else if (F_no_reception)
+            else if (F_failsafe)
             {
 #ifdef SPY
                 Serial.println("Mode : FLIGHT -> NONE");
@@ -251,6 +257,8 @@ void manageMode(void)
             }
             sbus_data.ch[4] = l_potentiometer;
             sbus_data.ch[5] = r_potentiometer;
+            sbus_data.lost_frame = F_frame_lost;
+            sbus_data.failsafe = F_failsafe;
             sbus_tx.data(sbus_data);
             sbus_tx.Write();
             break;
@@ -270,7 +278,7 @@ void manageMode(void)
                 ro_push_button_time = 0;
                 mode = STOP;
             }
-            else if (F_no_reception)
+            else if (F_failsafe)
             {
 #ifdef SPY
                 Serial.println("Mode : FLIGHT -> NONE");
@@ -342,6 +350,10 @@ void manageMode(void)
                 lo_push_button_time = 0;
                 ro_push_button_time = 0;
             }
+            sbus_data.ch[4] = l_potentiometer;
+            sbus_data.ch[5] = r_potentiometer;
+            sbus_data.lost_frame = F_frame_lost;
+            sbus_data.failsafe = F_failsafe;
             sbus_tx.data(sbus_data);
             sbus_tx.Write();
             break;

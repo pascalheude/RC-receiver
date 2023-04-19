@@ -31,7 +31,7 @@ void loop(void)
     loop_timer = micros() + 1000 * PIT_PERIOD;
     manageDrone();
     pit_number++;
-    if (F_no_reception == false)
+    if (F_failsafe == false)
     {
         switchOffLed1();
     }

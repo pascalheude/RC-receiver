@@ -11,7 +11,8 @@
 #include "RC-receiver.h"
 
 BOOLEAN F_one_reception_ok;
-BOOLEAN F_no_reception;
+BOOLEAN F_failsafe;
+BOOLEAN F_frame_lost;
 BOOLEAN r_toggle_switch;
 BOOLEAN li_push_button;
 BOOLEAN lo_push_button;
@@ -39,7 +40,8 @@ static Servo ch5_servo; // TBR
 void initializeDrone(void)
 {
     F_one_reception_ok = false;
-    F_no_reception = false;
+    F_failsafe = false;
+    F_frame_lost = false;
     r_toggle_switch = false;
     li_push_button = false;
     lo_push_button = false;
@@ -59,7 +61,8 @@ void manageDrone(void)
     if (readRadio())
     {
         F_one_reception_ok = true;
-        F_no_reception = false;
+        F_failsafe = false;
+        F_frame_lost = false;
         receive_time = pit_number;
         ch5_servo_value = map(radio_data.l_potentiometer, 0, 255, 0, 180);  // TBR
         ch5_servo.write(ch5_servo_value);                                   // TBR
@@ -105,9 +108,13 @@ void manageDrone(void)
     else
     {
         F_one_reception_ok = false;
-        if ((pit_number - receive_time) > (5000/PIT_PERIOD))
+        if ((pit_number - receive_time) > (1000/PIT_PERIOD))
         {
-            F_no_reception = true;
+            F_failsafe = true;
+        }
+        else if ((pit_number - receive_time) > (150/PIT_PERIOD))
+        {
+            F_frame_lost = true;
         }
         else
         {
