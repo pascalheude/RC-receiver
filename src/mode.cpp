@@ -24,8 +24,11 @@ typedef enum {
 #define ROLL 1
 #define PITCH 2
 #define YAW 3
-#define MIN_THROTLE 264  // 1045
-#define MAX_THROTLE 1728 // 1960
+#define ARM 4
+#define MIN_THROTTLE 264  // 1045
+#define MAX_THROTTLE 1728 // 1960
+#define NO_ARM_COMMAND 192 // 1000
+#define ARM_COMMAND 1152 // 1600
 
 
 static INT16 test_throttle;
@@ -49,7 +52,7 @@ void initializeMode(void)
     r_toggle_switch_time = 0;
     lo_push_button_time = 0;
     ro_push_button_time = 0;
-    test_throttle = MIN_THROTLE;
+    test_throttle = MIN_THROTTLE;
     mode = NONE;
 #ifdef LCD
     lcd.begin(16, 2);
@@ -57,11 +60,12 @@ void initializeMode(void)
     lcd.print("NONE");
 #endif // LCD
     sbus_tx.Begin();
-    sbus_data.ch[ROLL] = MIN_ESC_COMMAND;
-    sbus_data.ch[PITCH] = MIN_ESC_COMMAND;
-    sbus_data.ch[YAW] = MIN_ESC_COMMAND;
+    sbus_data.ch[ROLL] = NO_ESC_COMMAND;
+    sbus_data.ch[PITCH] = NO_ESC_COMMAND;
+    sbus_data.ch[YAW] = NO_ESC_COMMAND;
     sbus_data.ch[THROTTLE] = MIN_ESC_COMMAND;
-    for(i=(THROTTLE+1);i < sbus_data.NUM_CH;i++)
+    sbus_data.ch[ARM] = NO_ARM_COMMAND;
+    for(i=(ARM+1);i < sbus_data.NUM_CH;i++)
     {
         sbus_data.ch[i] = MIN_ESC_COMMAND;
     }
@@ -94,8 +98,8 @@ void manageMode(void)
             else
             {
             }
-            sbus_data.ch[4] = l_potentiometer;
-            sbus_data.ch[5] = r_potentiometer;
+            sbus_data.ch[5] = l_potentiometer;
+            sbus_data.ch[6] = r_potentiometer;
             sbus_data.lost_frame = F_frame_lost;
             sbus_data.failsafe = F_failsafe;
             sbus_tx.data(sbus_data);
@@ -123,10 +127,11 @@ void manageMode(void)
                 lcd.print("NONE");
 #endif // LCD
                 r_toggle_switch_time = 0;
-                sbus_data.ch[ROLL] = MIN_ESC_COMMAND;
-                sbus_data.ch[PITCH] = MIN_ESC_COMMAND;
-                sbus_data.ch[YAW] = MIN_ESC_COMMAND;
+                sbus_data.ch[ROLL] = NO_ESC_COMMAND;
+                sbus_data.ch[PITCH] = NO_ESC_COMMAND;
+                sbus_data.ch[YAW] = NO_ESC_COMMAND;
                 sbus_data.ch[THROTTLE] = MIN_ESC_COMMAND;
+                sbus_data.ch[ARM] = NO_ARM_COMMAND;
                 mode = NONE;
             }
             else if (r_toggle_switch == true)
@@ -145,10 +150,11 @@ void manageMode(void)
                     lcd.print("TEST");
 #endif // LCD
                     r_toggle_switch_time = 0;
-                    sbus_data.ch[ROLL] = MIN_ESC_COMMAND;
-                    sbus_data.ch[PITCH] = MIN_ESC_COMMAND;
-                    sbus_data.ch[YAW] = MIN_ESC_COMMAND;
+                    sbus_data.ch[ROLL] = NO_ESC_COMMAND;
+                    sbus_data.ch[PITCH] = NO_ESC_COMMAND;
+                    sbus_data.ch[YAW] = NO_ESC_COMMAND;
                     sbus_data.ch[THROTTLE] = MIN_ESC_COMMAND;
+                    sbus_data.ch[ARM] = ARM_COMMAND;
                     mode = TEST;
                 }
                 else
@@ -159,8 +165,8 @@ void manageMode(void)
             {
                 r_toggle_switch_time = 0;
             }
-            sbus_data.ch[4] = l_potentiometer;
-            sbus_data.ch[5] = r_potentiometer;
+            sbus_data.ch[5] = l_potentiometer;
+            sbus_data.ch[6] = r_potentiometer;
             sbus_data.lost_frame = F_frame_lost;
             sbus_data.failsafe = F_failsafe;
             sbus_tx.data(sbus_data);
@@ -176,6 +182,7 @@ void manageMode(void)
                 lcd.clear();
                 lcd.print("FLIGHT");
 #endif // LCD
+                sbus_data.ch[ARM] = ARM_COMMAND;
                 mode = FLIGHT;
             }
             else if (F_failsafe)
@@ -187,17 +194,18 @@ void manageMode(void)
                 lcd.clear();
                 lcd.print("NONE");
 #endif // LCD
-                sbus_data.ch[ROLL] = MIN_ESC_COMMAND;
-                sbus_data.ch[PITCH] = MIN_ESC_COMMAND;
-                sbus_data.ch[YAW] = MIN_ESC_COMMAND;
+                sbus_data.ch[ROLL] = NO_ESC_COMMAND;
+                sbus_data.ch[PITCH] = NO_ESC_COMMAND;
+                sbus_data.ch[YAW] = NO_ESC_COMMAND;
                 sbus_data.ch[THROTTLE] = MIN_ESC_COMMAND;
+                sbus_data.ch[ARM] = NO_ARM_COMMAND;
                 mode = NONE;
             }
             else
             {
             }
-            sbus_data.ch[4] = l_potentiometer;
-            sbus_data.ch[5] = r_potentiometer;
+            sbus_data.ch[5] = l_potentiometer;
+            sbus_data.ch[6] = r_potentiometer;
             sbus_data.lost_frame = F_frame_lost;
             sbus_data.failsafe = F_failsafe;
             sbus_tx.data(sbus_data);
@@ -215,39 +223,25 @@ void manageMode(void)
                 lcd.clear();
                 lcd.print("STOP");
 #endif // LCD
-                sbus_data.ch[ROLL] = MIN_ESC_COMMAND;
-                sbus_data.ch[PITCH] = MIN_ESC_COMMAND;
-                sbus_data.ch[YAW] = MIN_ESC_COMMAND;
+                sbus_data.ch[ROLL] = NO_ESC_COMMAND;
+                sbus_data.ch[PITCH] = NO_ESC_COMMAND;
+                sbus_data.ch[YAW] = NO_ESC_COMMAND;
                 sbus_data.ch[THROTTLE] = MIN_ESC_COMMAND;
+                sbus_data.ch[ARM] = NO_ARM_COMMAND;
                 mode = STOP;
-            }
-            else if (F_failsafe)
-            {
-#ifdef SPY
-                Serial.println("Mode : FLIGHT -> NONE");
-#endif // SPY
-#ifdef LCD
-                lcd.clear();
-                lcd.print("NONE");
-#endif // LCD
-                sbus_data.ch[ROLL] = MIN_ESC_COMMAND;
-                sbus_data.ch[PITCH] = MIN_ESC_COMMAND;
-                sbus_data.ch[YAW] = MIN_ESC_COMMAND;
-                sbus_data.ch[THROTTLE] = MIN_ESC_COMMAND;
-                mode = NONE;
             }
             else
             {
                 sbus_data.ch[ROLL] = (INT16)roll;
                 sbus_data.ch[PITCH] = (INT16)pitch;
                 sbus_data.ch[YAW] = (INT16)yaw;
-                if (throttle < MIN_THROTLE)
+                if (throttle < MIN_THROTTLE)
                 {
                     sbus_data.ch[THROTTLE] = MIN_ESC_COMMAND;
                 }
-                else if (throttle > MAX_THROTLE)
+                else if (throttle > MAX_THROTTLE)
                 {
-                    sbus_data.ch[THROTTLE] = MAX_THROTLE;
+                    sbus_data.ch[THROTTLE] = MAX_THROTTLE;
                 }
                 else
                 {
@@ -255,8 +249,8 @@ void manageMode(void)
                 }
                 sbus_data.ch[THROTTLE] = (INT16)throttle;
             }
-            sbus_data.ch[4] = l_potentiometer;
-            sbus_data.ch[5] = r_potentiometer;
+            sbus_data.ch[5] = l_potentiometer;
+            sbus_data.ch[6] = r_potentiometer;
             sbus_data.lost_frame = F_frame_lost;
             sbus_data.failsafe = F_failsafe;
             sbus_tx.data(sbus_data);
@@ -274,23 +268,10 @@ void manageMode(void)
                 lcd.print("STOP");
 #endif // LCD
                 sbus_data.ch[THROTTLE] = MIN_ESC_COMMAND;
+                sbus_data.ch[ARM] = NO_ARM_COMMAND;
                 lo_push_button_time = 0;
                 ro_push_button_time = 0;
                 mode = STOP;
-            }
-            else if (F_failsafe)
-            {
-#ifdef SPY
-                Serial.println("Mode : FLIGHT -> NONE");
-#endif // SPY
-#ifdef LCD
-                lcd.clear();
-                lcd.print("NONE");
-#endif // LCD
-                sbus_data.ch[THROTTLE] = MIN_ESC_COMMAND;
-                lo_push_button_time = 0;
-                ro_push_button_time = 0;
-                mode = NONE;
             }
             else if (li_push_button == true)
             {
@@ -301,6 +282,7 @@ void manageMode(void)
 #ifdef LCD
                 lcd.setCursor(1,1);
                 lcd.print(test_throttle);
+                lcd.print(" ");
 #endif // LCD
             }
             else if (lo_push_button == true)
@@ -313,10 +295,11 @@ void manageMode(void)
                 else if ((pit_number - lo_push_button_time) > (500/PIT_PERIOD))
                 {
                     lo_push_button_time = 0;
-                    test_throttle = LIMIT(test_throttle - 50, MIN_ESC_COMMAND, MAX_THROTLE);
+                    test_throttle = LIMIT(test_throttle - 50, MIN_ESC_COMMAND, MAX_THROTTLE);
 #ifdef LCD
                     lcd.setCursor(1,1);
                     lcd.print(test_throttle);
+                    lcd.print(" ");
 #endif // LCD
                 }
                 else
@@ -334,7 +317,7 @@ void manageMode(void)
                 else if ((pit_number - ro_push_button_time) > (500/PIT_PERIOD))
                 {
                     ro_push_button_time = 0;
-                    test_throttle = LIMIT(test_throttle + 50, MIN_ESC_COMMAND, MAX_THROTLE);
+                    test_throttle = LIMIT(test_throttle + 50, MIN_ESC_COMMAND, MAX_THROTTLE);
 #ifdef LCD
                     lcd.setCursor(1,1);
                     lcd.print(test_throttle);
@@ -350,8 +333,8 @@ void manageMode(void)
                 lo_push_button_time = 0;
                 ro_push_button_time = 0;
             }
-            sbus_data.ch[4] = l_potentiometer;
-            sbus_data.ch[5] = r_potentiometer;
+            sbus_data.ch[5] = l_potentiometer;
+            sbus_data.ch[6] = r_potentiometer;
             sbus_data.lost_frame = F_frame_lost;
             sbus_data.failsafe = F_failsafe;
             sbus_tx.data(sbus_data);

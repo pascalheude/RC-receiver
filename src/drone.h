@@ -1,4 +1,5 @@
 #define MIN_ESC_COMMAND 192
+#define NO_ESC_COMMAND 992
 
 extern BOOLEAN F_one_reception_ok;
 extern BOOLEAN F_failsafe;
