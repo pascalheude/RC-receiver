@@ -1,41 +1,36 @@
-// ARDUINO Pro Mini Mapping
-#define P0  0  // RX
-#define P1  1  // TX
-#define P2  2  // INT0
-#define P3  3  // INT1, PWM
-#define P4  4
-#define P5  5  // PWM
-#define P6  6  // PWM
-#define P7  7
-#define P8  8  // CLK0
-#define P9  9  // PWM
-#define P10 10 // SS, PWM
-#define P11 11 // MOSI, PWM
-#define P12 12 // MISO
-#define P13 13 // SCK, LED
-#define PA0 A0
-#define PA1 A1
-#define PA2 A2
-#define PA3 A3
-#define PA4 A4 // SDA
-#define PA5 A5 // SCL
-#define PA6 A6
-#define PA7 A7
+// ESP32 Mapping
+#define RX2    16
+#define TX2    17
+#define SCK    18
+#define MISO   19
+#define MOSI   23
+#define SS     5
+#define SCL    22
+#define SDA    21
+#define GPIO0  0
+#define GPIO2  2
+#define GPIO4  4
+#define GPIO25 25
+#define GPIO26 26
+#define GPIO27 27
+#define GPIO32 32
+#define GPIO33 33
+#define GPIO34 34
+#define GPIO35 35
+#define GPIO36 36
+#define GPIO39 39
 
-// RC Receiver mapping using ARDUINO Mapping
-#define CSN P2
-#define CE  P3
-#define CH1 P4
-#define CH2 P5
-#define CH3 P6
-#define CH4 P7
-#define CH5 P8
-#define CH6 P9
-#define CH7 P0
-#define CH8 P1
-#define CH9 P10
-#define LED1 PA2
-#define LED2 PA1
-#define LED3 PA0
-#define BATTERY PA3
-#define GPS_EN PA6
+// RC Receiver mapping using ESP32 Mapping
+#define CE GPIO4
+#define CSN SS
+#define CH1 GPIO32
+#define CH2 GPIO33
+#define CH3 GPIO25
+#define CH4 GPIO26
+#define CH5 GPIO27
+#define LED1 GPIO36
+#define LED2 GPIO39
+#define LED3 GPIO34
+#define BATTERY GPIO35
+#define GPS_EN GPIO2
+#define GPS_PPS GPIO0

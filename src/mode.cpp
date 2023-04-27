@@ -3,6 +3,7 @@
 #include "mode.h"
 #include "drone.h"
 #include "led.h"
+#include "mapping.h"
 #include "mathf.h"
 #include "nrf24l01.h"
 #include "RC-receiver.h"
@@ -39,7 +40,7 @@ static T_mode mode;
 #ifdef LCD
 static rgb_lcd lcd;
 #endif // LCD
-bfs::SbusTx sbus_tx(&Serial); // Do not use inversion, not working on Arduino
+bfs::SbusTx sbus_tx(&Serial1, RX2, TX2, true); // Use inversion (available for ESP32)
 bfs::SbusData sbus_data;
 
 void initializeMode(void)
