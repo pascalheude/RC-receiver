@@ -1,5 +1,5 @@
 // ESP32 Mapping
-#define RX2    16
+#define RX2    16 // Cannot be used as used as a GPIO
 #define TX2    17
 #define SCK    18
 #define MISO   19
@@ -10,6 +10,7 @@
 #define GPIO0  0
 #define GPIO2  2
 #define GPIO4  4
+#define GPIO16 16
 #define GPIO25 25
 #define GPIO26 26
 #define GPIO27 27
@@ -28,9 +29,9 @@
 #define CH3 GPIO25
 #define CH4 GPIO26
 #define CH5 GPIO27
-#define LED1 GPIO36
-#define LED2 GPIO39
-#define LED3 GPIO34
+#define LED1 GPIO0
+#define LED2 GPIO4
+#define LED3 GPIO16
 #define BATTERY GPIO35
 #define GPS_EN GPIO2
-#define GPS_PPS GPIO0
+#define GPS_PPS GPIO34

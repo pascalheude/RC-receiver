@@ -40,7 +40,7 @@ static T_mode mode;
 #ifdef LCD
 static rgb_lcd lcd;
 #endif // LCD
-bfs::SbusTx sbus_tx(&Serial1, RX2, TX2, true); // Use inversion (available for ESP32)
+bfs::SbusTx sbus_tx(&Serial1, GPIO36, TX2, true); // Use inversion (available for ESP32)
 bfs::SbusData sbus_data;
 
 void initializeMode(void)
